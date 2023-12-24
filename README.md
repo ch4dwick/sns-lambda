@@ -2,11 +2,11 @@
 
 ## Purpose
 
-When you simply connect a CodePipeline notification to an SNS Topic, the resulting e-mail is a raw unreadable JSON message that can be hard to read. I figured it would be nice to format that message to be more readable.
+When you connect a CodePipeline notification to an SNS Topic the resulting e-mail is a raw unreadable JSON message that can be hard to read. I figured it would be nice to format that message to be more readable.
 
 This project takes the concepts described [here](https://docs.aws.amazon.com/lambda/latest/dg/with-sns-example.html#with-sns-create-subscription) and [here](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html).
 
-I realized at the time of this writing that there were next to no viable examples of SNS-CodePipeline examples online.
+I realized at the time of this writing that there were next to no viable examples of SNS to CodePipeline online.
 
 ## Requirements and Assumptions
 
