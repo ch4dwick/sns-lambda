@@ -1,0 +1,61 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  sns-lambda
+
+  SAM Template for sns-lambda
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 10
+    # You can add LoggingConfig parameters such as the Logformat, Log Group, and SystemLogLevel or ApplicationLogLevel. Learn more here https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-function.html#sam-function-loggingconfig.
+    LoggingConfig:
+      LogFormat: Text
+Resources:
+  SNSLambdaFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: sns-handler/
+      Handler: app.lambdaHandler
+      Runtime: nodejs20.x
+      Architectures:
+        - arm64
+      Environment:
+        Variables:
+          PARAMETERS_SECRETS_EXTENSION_LOG_LEVEL: info
+      # Since this will just be executed by SNS, you don't need the API access.
+      # Events:
+      #   SNSLambda:
+      #     Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+      #     Properties:
+      #       Path: /sns
+      #       Method: get
+
+      # Used to run the SSM Parameter Store API in localhost
+      Layers:
+        - "arn:aws:lambda:ap-southeast-1:044395824272:layer:AWS-Parameters-and-Secrets-Lambda-Extension-Arm64:11"
+    Metadata: # Manage esbuild properties
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2020
+        Sourcemap: true
+        EntryPoints:
+          - app.ts
+
+Outputs:
+  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
+  # Find out more about other implicit resources you can reference within SAM
+  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+  # SNSLambdaApi:
+  #   Description: API Gateway endpoint URL for Prod stage for SNS Lambda function
+  #   Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/sns/"
+  SNSLambdaFunction:
+    Description: >
+      SNS Lambda Function Arn when you connect a topic to a Lambda execution role.
+      When you create a subscription to your SNS, use AWS Lambda for the protocol.
+    Value: !GetAtt SNSLambdaFunction.Arn
+  SNSLambdaFunctionIamRole:
+    Description: Implicit IAM Role created for SNS Lambda function
+    Value: !GetAtt SNSLambdaFunctionRole.Arn
