@@ -1,6 +1,6 @@
 import { SNSEvent, SNSHandler, SNSEventRecord, Context } from 'aws-lambda';
 import mail from '@sendgrid/mail';
-import fetch, { Response } from 'node-fetch';
+import { SSMClient, GetParameterCommand, GetParameterCommandOutput } from '@aws-sdk/client-ssm';
 
 /**
  *
@@ -67,23 +67,11 @@ async function sendEmail(message: string): Promise<void> {
         subject: 'CodePipeline Status Alerts',
         text: message,
     };
-    const awsSessionToken = process.env.AWS_SESSION_TOKEN;
-    const res: Response = await fetch(
-        'http://localhost:2773/systemsmanager/parameters/get?name=SENDGRID_KEY&version=1&withDecryption=true',
-        {
-            method: 'GET',
-            headers: {
-                'X-Aws-Parameters-Secrets-Token': String(awsSessionToken),
-            },
-        },
-    );
+    const ssmCommand = new GetParameterCommand({ WithDecryption: true, Name: 'SENDGRID_KEY:1' });
+    const ssmClient = new SSMClient();
+    const ssmRes: GetParameterCommandOutput = await ssmClient.send(ssmCommand);
 
-    // I do not recommend using res.json() as it returns an unknown type and is a lot more work than
-    // dealing with text().
-    const jsonRes = await res.text();
-    const objRes = JSON.parse(jsonRes);
-
-    mail.setApiKey(objRes.Parameter.Value.toString());
+    mail.setApiKey(ssmRes.Parameter?.Value ?? '');
     await mail
         .send(msg)
         .then(() => {

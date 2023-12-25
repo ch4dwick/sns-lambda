@@ -31,10 +31,6 @@ Resources:
       #     Properties:
       #       Path: /sns
       #       Method: get
-
-      # Used to run the SSM Parameter Store API in localhost
-      Layers:
-        - "arn:aws:lambda:ap-southeast-1:044395824272:layer:AWS-Parameters-and-Secrets-Lambda-Extension-Arm64:11"
     Metadata: # Manage esbuild properties
       BuildMethod: esbuild
       BuildProperties:
