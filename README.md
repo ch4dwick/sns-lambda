@@ -13,7 +13,7 @@ I realized at the time of this writing that there were next to no viable real-li
 - SAM CLI v1.105.0
 - Permission to deploy lambda functions with SAM.
 - For parameter store access you only need arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess.
-- The incoming source event is CodePipeline. You may need to tweak the fields in processMessageAsync() to match the structure of the source event.Sample pipeline in [pipeline-sample](pipeline-sample/my-pipeline.tf)
+- The incoming source event is CodePipeline. You may need to tweak the fields in processMessageAsync() to match the structure of the source event. Sample pipeline in [pipeline-sample](pipeline-sample/my-pipeline.tf)
 - A compatible Lambda Execution Role (included in the template)
 - Existing SNS Topic used by a [CodePipeline notification rule](https://docs.aws.amazon.com/codepipeline/latest/userguide/notification-rule-create.html). Sample rule in [pipeline-sample](pipeline-sample/my-pipeline.tf)
 - SendGrid API key as a SecureString in the Parameter Store named SENDGRID_KEY. It must be in the same region of the Lambda Function. You don't need to use SendGrid to get this function to work. You can use your APIs or even forward the formatted result to another SNS topic. You can even simpliy use CloudWatch. This is more of a proof-of-concept for me.
