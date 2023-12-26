@@ -1,5 +1,5 @@
 import { SNSEvent, SNSHandler, SNSEventRecord, Context } from 'aws-lambda';
-import mail from '@sendgrid/mail';
+import mail, { ResponseError } from '@sendgrid/mail';
 import { SSMClient, GetParameterCommand, GetParameterCommandOutput } from '@aws-sdk/client-ssm';
 
 /**
@@ -77,8 +77,11 @@ async function sendEmail(message: string): Promise<void> {
         .then(() => {
             console.log('Email successful.');
         })
-        .catch((err) => {
-            console.error(err);
+        .catch((err: Error) => {
+            console.error(`Error: ${JSON.stringify(err, null, 2)}`);
+        })
+        .catch((err: ResponseError) => {
+            console.error(`Error: ${JSON.stringify(err, null, 2)}`);
 
             if (err.response) {
                 console.error(err.response.body);
