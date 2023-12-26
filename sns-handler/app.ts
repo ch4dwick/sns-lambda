@@ -62,8 +62,8 @@ async function processMessageAsync(record: SNSEventRecord): Promise<void> {
 
 async function sendEmail(message: string): Promise<void> {
     const msg: mail.MailDataRequired = {
-        to: 'developer@payeah.io',
-        from: 'no-reply@payeah.io',
+        to: 'ch4dwick@github.com',
+        from: 'Github <no-reply@github.com>',
         subject: 'CodePipeline Status Alerts',
         text: message,
     };
