@@ -21,9 +21,6 @@ Resources:
       Runtime: nodejs20.x
       Architectures:
         - arm64
-      Environment:
-        Variables:
-          PARAMETERS_SECRETS_EXTENSION_LOG_LEVEL: info
       # Since this will just be executed by SNS, you don't need the API access.
       # Events:
       #   SNSLambda:
