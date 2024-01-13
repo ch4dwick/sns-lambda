@@ -1,4 +1,4 @@
-# AWS CodePipeline to SNS Notification Processor using TypeScript
+# AWS CodePipeline / CodeBuild to SNS Notification Processor using TypeScript
 
 ## Purpose
 
