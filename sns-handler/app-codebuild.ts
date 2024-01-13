@@ -18,17 +18,17 @@ async function processMessageAsync(record: SNSEventRecord): Promise<void> {
 
         let emailMsg = '';
 
-        // This code is only for CodePipeline executions
-        if (jsonMessage.source !== 'aws.codepipeline') return;
+        // This code is only for CodeBuild executions
+        if (jsonMessage.source !== 'aws.codebuild') return;
 
         console.log(`Raw message: ${message}`);
         emailMsg =
             `<strong>Account:</strong> ${jsonMessage.account}<br/>\r\n` +
             `<strong>Region:</strong> ${jsonMessage.region}<br/>\r\n` +
-            `<strong>State:</strong> ${jsonMessage.detail.state}<br/>\r\n` +
-            `<strong>Time:</strong> ${jsonMessage.detail['start-time']}<br/>\r\n` +
-            `<strong>Pipeline:</strong> ${jsonMessage.detail.pipeline}<br/>\r\n` +
-            `<strong>Execution ID:</strong> ${jsonMessage.detail['execution-id']}<br/>\r\n`;
+            `<strong>State:</strong> ${jsonMessage.detail['build-status']}<br/>\r\n` +
+            `<strong>Time:</strong> ${jsonMessage.time}<br/>\r\n` +
+            `<strong>CodeBuild:</strong> ${jsonMessage.detail['project-name']}<br/>\r\n` +
+            `<strong>Execution ID:</strong> ${jsonMessage.detail['build-id']}<br/>\r\n`;
 
         // These fields are only available post-build and only available after GitHub push event.
         // A release change will not contain these data.
@@ -49,13 +49,16 @@ async function processMessageAsync(record: SNSEventRecord): Promise<void> {
                 );
             }
         }
-        // Include aws logs tail command
-        emailMsg = emailMsg.concat(
-            '<hr>Follow in Cloudwatch:<br/>\r\n' +
-                `<strong>node/typescript:</strong> aws logs tail payeah-codebuild --log-stream-name-prefix buildnodets/${jsonMessage.detail['execution-id']} --follow --since 1h<br/>\r\n` +
-                `<strong>java maven:</strong> aws logs tail payeah-codebuild --log-stream-name-prefix build-docker-ecr-maven/${jsonMessage.detail['execution-id']} --follow --since 1h<br/>\r\n`,
+        // Include aws logs tail command. Sadly IN_PROGRESS does not include this detail.
+        if (jsonMessage.detail['build-status'] !== 'IN_PROGRESS') {
+            emailMsg = emailMsg.concat(
+                '<hr>Follow in Cloudwatch:<br/>\r\n' +
+                    `aws logs tail ${jsonMessage.detail['additional-information'].logs['group-name']} --log-stream-name-prefix ${jsonMessage.detail['additional-information'].logs['stream-name']} --follow --since 1h<br/>\r\n`,
+            );
+        }
+        await Promise.resolve(
+            sendMail(jsonMessage.detail['build-status'], jsonMessage.detail['project-name'], emailMsg),
         );
-        await Promise.resolve(sendMail(jsonMessage.detail.state, jsonMessage.detail.pipeline, emailMsg)); //Placeholder for actual async work
     } catch (err) {
         console.error('An error occurred');
         throw err;

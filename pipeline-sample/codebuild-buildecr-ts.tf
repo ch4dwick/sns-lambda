@@ -49,3 +49,23 @@ EOT
 
   source_version = "master"
 }
+
+
+# You can use this to enable CodeBuild notifications
+resource "aws_codestarnotifications_notification_rule" "build-docker-ecr-codebuild" {
+  detail_type = "FULL"
+  event_type_ids = [
+    "codebuild-project-build-state-failed",
+    "codebuild-project-build-state-succeeded",
+    "codebuild-project-build-state-in-progress",
+    "codebuild-project-build-state-stopped"
+  ]
+
+  name     = "build-docker-ecr-notif"
+  resource = aws_codebuild_project.build-docker-ecr-ts.arn
+
+  target {
+    type    = "SNS"
+    address = "arn:aws:sns:ap-southeast-1:xxxxxx:my-topic"
+  }
+}

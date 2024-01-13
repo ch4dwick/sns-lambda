@@ -36,7 +36,43 @@ Resources:
         Sourcemap: true
         EntryPoints:
           - app.ts
-
+  SNSLambdaFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Join ["/", ["/aws/lambda", !Ref SNSLambdaFunction]]
+      RetentionInDays: 3
+    DeletionPolicy: Delete
+  SNSLambdaFunctionCodeBuild:
+    Type: AWS::Serverless::Function
+    Properties:
+      Role: arn:aws:iam::641848999125:role/-lambda-role
+      # Role: arn:aws:iam::335328772716:role/-lambda-role
+      CodeUri: sns-handler/
+      Handler: app-codebuild.lambdaHandler
+      Runtime: nodejs20.x
+      Architectures:
+        - arm64
+      # Events:
+      #   SNSLambda:
+      #     Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+      #     Properties:
+      #       Path: /codebuild
+      #       Method: get
+    Metadata: # Manage esbuild properties
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: es2020
+        Sourcemap: true
+        EntryPoints:
+          - app-codebuild.ts
+  SNSLambdaFunctionCodeBuildLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName:
+        !Join ["/", ["/aws/lambda", !Ref SNSLambdaFunctionCodeBuild]]
+      RetentionInDays: 3
+    DeletionPolicy: Delete
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
   # Find out more about other implicit resources you can reference within SAM
@@ -49,6 +85,9 @@ Outputs:
       SNS Lambda Function Arn when you connect a topic to a Lambda execution role.
       When you create a subscription to your SNS, use AWS Lambda for the protocol.
     Value: !GetAtt SNSLambdaFunction.Arn
+  SNSLambdaCodeBuildFunction:
+    Description: SNS Lambda Function for CodeBuilds
+    Value: !GetAtt SNSLambdaFunctionCodeBuild.Arn
   SNSLambdaFunctionIamRole:
     Description: Implicit IAM Role created for SNS Lambda function
     Value: !GetAtt SNSLambdaFunctionRole.Arn
