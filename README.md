@@ -2,7 +2,7 @@
 
 ## Purpose
 
-When you use a CodePipeline notification rule to an SNS Topic, the resulting e-mail is a raw JSON message that can be hard to read. After reading through some documentation about the theory and recommendations of this use case, I figured it would be nice to format that message to be more readable as well as brush up on TypeScript.
+When you use a CodePipeline/CodeBuild notification rule to an SNS Topic, the resulting e-mail is a raw JSON message that is too verbose and can be hard to read. After reading through some documentation about the theory and recommendations of this use case, I figured it would be nice to format that message to be more readable as well as brush up on TypeScript.
 
 This project takes the concepts described [here](https://docs.aws.amazon.com/lambda/latest/dg/with-sns-example.html#with-sns-create-subscription) and [here](https://docs.aws.amazon.com/systems-manager/latest/userguide/ps-integration-lambda-extensions.html).
 
@@ -31,6 +31,8 @@ sam build && sam deploy --stack-name sns-lambda
 Use the SNS Test Template and insert the test data below under Records[].Sns.Message field. Keep the data enclosed in quotes and escape the json quotes.
 
 > "Message": "{\\"account\\": \\"xxxxxxxxxxxx\\"}"
+
+You can also test it directly by Publishing a message to your SNS Topic with the payloads below as the body.
 
 ### Start Execution from manual trigger
 
@@ -140,6 +142,154 @@ Use the SNS Test Template and insert the test data below under Records[].Sns.Mes
     "pipeline-execution-attempt": 1.0
   },
   "resources": ["arn:aws:codepipeline:ap-southeast-1:xxxxxxxxxxxx:my-pipeline"],
+  "additionalAttributes": {}
+}
+```
+
+### CodeBuild Succeeded
+
+```json
+{
+  "account": "xxxxx",
+  "detailType": "CodeBuild Build State Change",
+  "region": "ap-southeast-1",
+  "source": "aws.codebuild",
+  "time": "2024-01-11T15:28:24Z",
+  "notificationRuleArn": "arn:aws:codestar-notifications:ap-southeast-1:xxxxx:notificationrule/xxxxxx",
+  "detail": {
+    "build-status": "SUCCEEDED",
+    "project-name": "my-build",
+    "build-id": "arn:aws:codebuild:ap-southeast-1:xxxx:build/my-build:xxxxx",
+    "additional-information": {
+      "cache": {
+        "location": "s3-cache/cache",
+        "type": "S3"
+      },
+      "build-number": 3,
+      "timeout-in-minutes": 15,
+      "build-complete": true,
+      "initiator": "GitHub-Hookshot/xxxxx",
+      "build-start-time": "Jan 11, 2024 3:25:27 PM",
+      "source": {
+        "report-build-status": false,
+        "location": "https://github.com/ch4dwick/sns-lambda.git",
+        "git-clone-depth": 1,
+        "type": "GITHUB",
+        "git-submodules-config": {
+          "fetch-submodules": false
+        }
+      },
+      "source-version": "xxxxx",
+      "artifact": {
+        "md5sum": "xxxx",
+        "sha256sum": "xxxx",
+        "location": "arn:aws:s3:::s3-bucket/my-artifact"
+      },
+      "environment": {
+        "image": "aws/codebuild/amazonlinux2-x86_64-standard:corretto8",
+        "privileged-mode": true,
+        "image-pull-credentials-type": "CODEBUILD",
+        "compute-type": "BUILD_GENERAL1_MEDIUM",
+        "type": "LINUX_CONTAINER"
+      },
+      "logs": {
+        "group-name": "codebuild",
+        "stream-name": "my-build/my-stream",
+        "deep-link": "https://console.aws.amazon.com/cloudwatch/home?region=ap-southeast-1#logsV2:log-groups/log-group/my-build/log-events/my-code$252F5986d724-0575-4f15-9cc8-0fb5cd4b2fb7"
+      },
+      "phases": [
+        {
+          "phase-context": [],
+          "start-time": "Jan 11, 2024 3:25:27 PM",
+          "end-time": "Jan 11, 2024 3:25:27 PM",
+          "duration-in-seconds": 0,
+          "phase-type": "SUBMITTED",
+          "phase-status": "SUCCEEDED"
+        },
+        {
+          "phase-context": [],
+          "start-time": "Jan 11, 2024 3:25:27 PM",
+          "end-time": "Jan 11, 2024 3:25:28 PM",
+          "duration-in-seconds": 0,
+          "phase-type": "QUEUED",
+          "phase-status": "SUCCEEDED"
+        },
+        {
+          "phase-context": [": "],
+          "start-time": "Jan 11, 2024 3:25:28 PM",
+          "end-time": "Jan 11, 2024 3:25:56 PM",
+          "duration-in-seconds": 28,
+          "phase-type": "PROVISIONING",
+          "phase-status": "SUCCEEDED"
+        },
+        {
+          "phase-context": [": "],
+          "start-time": "Jan 11, 2024 3:25:56 PM",
+          "end-time": "Jan 11, 2024 3:26:12 PM",
+          "duration-in-seconds": 16,
+          "phase-type": "DOWNLOAD_SOURCE",
+          "phase-status": "SUCCEEDED"
+        },
+        {
+          "phase-context": [": "],
+          "start-time": "Jan 11, 2024 3:26:12 PM",
+          "end-time": "Jan 11, 2024 3:26:12 PM",
+          "duration-in-seconds": 0,
+          "phase-type": "INSTALL",
+          "phase-status": "SUCCEEDED"
+        },
+        {
+          "phase-context": [": "],
+          "start-time": "Jan 11, 2024 3:26:12 PM",
+          "end-time": "Jan 11, 2024 3:26:33 PM",
+          "duration-in-seconds": 20,
+          "phase-type": "PRE_BUILD",
+          "phase-status": "SUCCEEDED"
+        },
+        {
+          "phase-context": [": "],
+          "start-time": "Jan 11, 2024 3:26:33 PM",
+          "end-time": "Jan 11, 2024 3:27:59 PM",
+          "duration-in-seconds": 86,
+          "phase-type": "BUILD",
+          "phase-status": "SUCCEEDED"
+        },
+        {
+          "phase-context": [": "],
+          "start-time": "Jan 11, 2024 3:27:59 PM",
+          "end-time": "Jan 11, 2024 3:28:22 PM",
+          "duration-in-seconds": 23,
+          "phase-type": "POST_BUILD",
+          "phase-status": "SUCCEEDED"
+        },
+        {
+          "phase-context": [": "],
+          "start-time": "Jan 11, 2024 3:28:22 PM",
+          "end-time": "Jan 11, 2024 3:28:23 PM",
+          "duration-in-seconds": 0,
+          "phase-type": "UPLOAD_ARTIFACTS",
+          "phase-status": "SUCCEEDED"
+        },
+        {
+          "phase-context": [": "],
+          "start-time": "Jan 11, 2024 3:28:23 PM",
+          "end-time": "Jan 11, 2024 3:28:23 PM",
+          "duration-in-seconds": 0,
+          "phase-type": "FINALIZING",
+          "phase-status": "SUCCEEDED"
+        },
+        {
+          "start-time": "Jan 11, 2024 3:28:23 PM",
+          "phase-type": "COMPLETED"
+        }
+      ],
+      "queued-timeout-in-minutes": 480
+    },
+    "current-phase": "COMPLETED",
+    "current-phase-context": "[: ]",
+    "version": "1"
+  },
+  "resources": ["arn:aws:codebuild:ap-southeast-1:xxxxx:build/my-build:xxxxx"],
   "additionalAttributes": {}
 }
 ```
